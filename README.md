@@ -1,58 +1,164 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Task Management Module
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A simple Task Management System built with Laravel, featuring authentication, task CRUD operations, search & filtering, pagination, and AJAX-based status updates.
 
-## About Laravel
+**Repository:** https://github.com/wajahat-088/task-manager
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Authentication** — Laravel Breeze (login, registration, email verification)
+- **Dashboard** — Overview of total, pending, in-progress, and completed tasks
+- **Task Management** — Create, edit, delete, and list tasks
+- **Search & Filters** — Search by title, filter by status and priority
+- **Pagination** — Task listing is paginated
+- **AJAX Status Update** — Update a task's status directly from the listing page without a full page reload
+- **Form Request Validation** — Centralized validation logic via `TaskRequest`
+- **Eloquent Relationships** — `Task belongsTo User` (creator)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Tech Stack
 
-## Learning Laravel
+- Laravel (PHP Framework)
+- Laravel Breeze (Authentication)
+- MySQL (Database)
+- Blade Templates
+- Tailwind CSS
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Database Structure
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### `tasks` table
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+| Field        | Type                                          |
+|--------------|------------------------------------------------|
+| id           | bigint                                          |
+| title        | string                                          |
+| description  | text (nullable)                                 |
+| status       | enum (`pending`, `in_progress`, `completed`)    |
+| priority     | enum (`low`, `medium`, `high`)                  |
+| due_date     | date                                             |
+| created_by   | foreign key → users.id                          |
+| created_at   | timestamp                                       |
+| updated_at   | timestamp                                       |
 
-## Agentic Development
+## Validation Rules
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Task creation and updates are validated via `App\Http\Requests\TaskRequest`:
 
-```bash
-composer require laravel/boost --dev
+| Field        | Rules                                              |
+|--------------|------------------------------------------------------|
+| title        | required, min 3 characters, max 255 characters       |
+| description  | optional, string                                      |
+| status       | required, must be one of: pending, in_progress, completed |
+| priority     | required, must be one of: low, medium, high           |
+| due_date     | required, valid date, must be today or a future date  |
 
-php artisan boost:install
+## Installation Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/wajahat-088/task-management-system_new.git
+   cd task-management-system_new
+   ```
+
+2. **Install PHP dependencies**
+   ```bash
+   composer install
+   ```
+
+3. **Install JS dependencies & build assets**
+   ```bash
+   npm install
+   npm run build
+   ```
+
+4. **Create environment file**
+   ```bash
+   cp .env.example .env
+   ```
+
+5. **Generate application key**
+   ```bash
+   php artisan key:generate
+   ```
+
+6. **Configure database** in `.env`
+   ```
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=task_manager
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
+
+7. **Run migrations and seeders**
+   ```bash
+   php artisan migrate --seed
+   ```
+
+8. **Start the development server**
+   ```bash
+   php artisan serve
+   ```
+
+9. **Visit the application**
+   ```
+   http://localhost:8000
+   ```
+
+## Default Seeded Users
+
+| Name         | Email            | Password   |
+|--------------|------------------|------------|
+| Admin User   | admin@test.com   | password   |
+| John Doe     | john@test.com    | password   |
+| Jane Smith   | jane@test.com    | password   |
+
+## Seeded Data
+
+- 3 users
+- 20 sample tasks with varying status, priority, and due dates
+
+## Folder Structure (Key Files)
+
+```
+app/
+  Http/
+    Controllers/
+      TaskController.php
+    Requests/
+      TaskRequest.php
+  Models/
+    Task.php
+    User.php
+database/
+  migrations/
+    xxxx_create_tasks_table.php
+  seeders/
+    UserSeeder.php
+    TaskSeeder.php
+resources/
+  views/
+    dashboard.blade.php
+    tasks/
+      index.blade.php
+      create.blade.php
+      edit.blade.php
+routes/
+  web.php
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Notes
 
-## Contributing
+- Validation is handled via `TaskRequest` (Form Request class), keeping validation logic separate from the controller.
+- Status updates on the task listing page are handled via AJAX (`PATCH /tasks/{task}/status`) for a smoother user experience.
+- Search and filters are implemented using Eloquent query scopes defined on the `Task` model.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Bonus Features Implemented
 
-## Code of Conduct
+- ✅ AJAX status update (task status can be changed from the listing page without a page reload)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Author
 
-## Security Vulnerabilities
+**Wajahat**
+GitHub: [@wajahat-088](https://github.com/wajahat-088)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
