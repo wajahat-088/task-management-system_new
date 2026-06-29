@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 
 
+
 class TaskController extends Controller
 {
     /**
@@ -26,28 +27,37 @@ class TaskController extends Controller
     }
 
     /**
-     * Display a paginated, searchable, and filterable list of tasks.
-     */
-    public function index(Request $request)
-    {
-        $query = Task::with('creator');
+ * Display a paginated, searchable, filterable, and sortable list of tasks.
+ */
+public function index(Request $request)
+{
+    $query = Task::with('creator');
 
-        if ($request->filled('search')) {
-            $query->search($request->search);
-        }
-
-        if ($request->filled('status')) {
-            $query->filterStatus($request->status);
-        }
-
-        if ($request->filled('priority')) {
-            $query->filterPriority($request->priority);
-        }
-
-        $tasks = $query->latest()->paginate(10)->withQueryString();
-
-        return view('tasks.index', compact('tasks'));
+    if ($request->filled('search')) {
+        $query->search($request->search);
     }
+
+    if ($request->filled('status')) {
+        $query->filterStatus($request->status);
+    }
+
+    if ($request->filled('priority')) {
+        $query->filterPriority($request->priority);
+    }
+
+    // Only allow sorting on these specific columns (prevents arbitrary column injection)
+    $sortColumn = in_array($request->sort, ['title', 'priority', 'status', 'due_date', 'created_at'])
+        ? $request->sort
+        : 'created_at';
+
+    $sortDirection = $request->direction === 'asc' ? 'asc' : 'desc';
+
+    $query->orderBy($sortColumn, $sortDirection);
+
+    $tasks = $query->paginate(10)->withQueryString();
+
+    return view('tasks.index', compact('tasks', 'sortColumn', 'sortDirection'));
+}
 
     /**
      * Show the form for creating a new task.

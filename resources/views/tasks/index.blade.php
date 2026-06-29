@@ -52,16 +52,40 @@
             {{-- Tasks Table --}}
             <div class="bg-white rounded-lg shadow overflow-hidden">
                 <table class="w-full text-sm">
-                    <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
-                        <tr>
-                            <th class="px-6 py-3 text-left">Title</th>
-                            <th class="px-6 py-3 text-left">Priority</th>
-                            <th class="px-6 py-3 text-left">Status</th>
-                            <th class="px-6 py-3 text-left">Due Date</th>
-                            <th class="px-6 py-3 text-left">Created By</th>
-                            <th class="px-6 py-3 text-left">Actions</th>
-                        </tr>
-                    </thead>
+                   <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+    <tr>
+        @php
+            $columns = [
+                'title'      => 'Title',
+                'priority'   => 'Priority',
+                'status'     => 'Status',
+                'due_date'   => 'Due Date',
+            ];
+        @endphp
+
+        @foreach($columns as $column => $label)
+            <th class="px-6 py-3 text-left">
+                <a href="{{ route('tasks.index', array_merge(request()->query(), [
+                        'sort' => $column,
+                        'direction' => ($sortColumn === $column && $sortDirection === 'asc') ? 'desc' : 'asc',
+                    ])) }}"
+                   class="flex items-center gap-1 hover:text-gray-900">
+                    {{ $label }}
+                    @if($sortColumn === $column)
+                        @if($sortDirection === 'asc')
+                            <span>↑</span>
+                        @else
+                            <span>↓</span>
+                        @endif
+                    @endif
+                </a>
+            </th>
+        @endforeach
+
+        <th class="px-6 py-3 text-left">Created By</th>
+        <th class="px-6 py-3 text-left">Actions</th>
+    </tr>
+</thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse($tasks as $task)
                         <tr class="hover:bg-gray-50">
