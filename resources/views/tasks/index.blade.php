@@ -23,7 +23,7 @@
                            class="border rounded px-3 py-2 flex-1 min-w-[200px]">
 
                     {{-- Status filter --}}
-                    <select name="status" class="border rounded px-3 py-2">
+                    <select name="status" class="border rounded px-5 py-2">
                         <option value="">All Status</option>
                         <option value="pending"     {{ request('status') == 'pending'     ? 'selected' : '' }}>Pending</option>
                         <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
@@ -31,7 +31,7 @@
                     </select>
 
                     {{-- Priority filter --}}
-                    <select name="priority" class="border rounded px-3 py-2">
+                    <select name="priority" class="border rounded px-8 py-2">
                         <option value="">All Priority</option>
                         <option value="low"    {{ request('priority') == 'low'    ? 'selected' : '' }}>Low</option>
                         <option value="medium" {{ request('priority') == 'medium' ? 'selected' : '' }}>Medium</option>
@@ -105,7 +105,7 @@
                             {{-- Status — Editable AJAX Dropdown --}}
                             <td class="px-6 py-4">
                                 <select
-                                    class="status-select text-xs border rounded px-2 py-1 cursor-pointer
+                                    class="status-select text-xs border rounded px-6 py-1 cursor-pointer
                                         @if($task->status == 'completed') bg-green-100 text-green-700
                                         @elseif($task->status == 'in_progress') bg-blue-100 text-blue-700
                                         @else bg-yellow-100 text-yellow-700 @endif"
