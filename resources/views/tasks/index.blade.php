@@ -23,7 +23,7 @@
                            class="border rounded px-3 py-2 flex-1 min-w-[200px]">
 
                     {{-- Status filter --}}
-                    <select name="status" class="border rounded px-5 py-2">
+                    <select name="status" class="border rounded px-8 py-2">
                         <option value="">All Status</option>
                         <option value="pending"     {{ request('status') == 'pending'     ? 'selected' : '' }}>Pending</option>
                         <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
