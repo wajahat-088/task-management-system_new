@@ -7,6 +7,11 @@
                 + Add Product
             </a>
         </div>
+        <div class="flex justify-end mt-3"><a href="{{ route('activity-logs.index') }}"
+               class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                View Activity Logs
+            </a>
+         </div>
     </x-slot>
 
     <div class="py-12">
