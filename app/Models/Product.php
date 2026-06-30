@@ -46,4 +46,11 @@ class Product extends Model
     {
         return $query->where('category_id', $categoryId);
     }
+
+    // Task.php, Product.php, aur Category.php — teeno mein yeh add karein
+
+    public function activityLogs()
+    {
+        return $this->morphMany(ActivityLog::class, 'loggable');
+    }
 }
