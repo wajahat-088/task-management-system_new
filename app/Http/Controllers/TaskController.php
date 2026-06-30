@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Models\Product;
 use App\Http\Requests\TaskRequest;
 use Illuminate\Http\Request;
 
@@ -16,14 +17,20 @@ class TaskController extends Controller
      */
     public function dashboard()
     {
-        $stats = [
+        $stats_tasks = [
             'total'       => Task::count(),
             'pending'     => Task::where('status', 'pending')->count(),
             'in_progress' => Task::where('status', 'in_progress')->count(),
             'completed'   => Task::where('status', 'completed')->count(),
         ];
+        $stats_products = [
+            'total'       => Product::count(),
+            'pending'     => Product::where('status', 'pending')->count(),
+            'in_progress' => Product::where('status', 'in_progress')->count(),
+            'completed'   => Product::where('status', 'completed')->count(),
+        ];
 
-        return view('dashboard', compact('stats'));
+        return view('dashboard', compact('stats_tasks', 'stats_products'));
     }
 
     /**

@@ -14,28 +14,59 @@
                 {{-- Total --}}
                 <div class="bg-white rounded-lg shadow p-6 text-center">
                     <p class="text-gray-500 text-sm">Total Tasks</p>
-                    <p class="text-4xl font-bold text-gray-800 mt-2">{{ $stats['total'] }}</p>
+                    <p class="text-4xl font-bold text-gray-800 mt-2">{{ $stats_tasks['total'] }}</p>
                 </div>
 
                 {{-- Pending --}}
                 <div class="bg-yellow-50 rounded-lg shadow p-6 text-center">
                     <p class="text-yellow-600 text-sm">Pending</p>
-                    <p class="text-4xl font-bold text-yellow-700 mt-2">{{ $stats['pending'] }}</p>
+                    <p class="text-4xl font-bold text-yellow-700 mt-2">{{ $stats_tasks['pending'] }}</p>
                 </div>
 
                 {{-- In Progress --}}
                 <div class="bg-blue-50 rounded-lg shadow p-6 text-center">
                     <p class="text-blue-600 text-sm">In Progress</p>
-                    <p class="text-4xl font-bold text-blue-700 mt-2">{{ $stats['in_progress'] }}</p>
+                    <p class="text-4xl font-bold text-blue-700 mt-2">{{ $stats_tasks['in_progress'] }}</p>
                 </div>
 
                 {{-- Completed --}}
                 <div class="bg-green-50 rounded-lg shadow p-6 text-center">
                     <p class="text-green-600 text-sm">Completed</p>
-                    <p class="text-4xl font-bold text-green-700 mt-2">{{ $stats['completed'] }}</p>
+                    <p class="text-4xl font-bold text-green-700 mt-2">{{ $stats_tasks['completed'] }}</p>
                 </div>
 
             </div>
+
+             {{-- Stats Product Cards --}}
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+
+                {{-- Total --}}
+                <div class="bg-white rounded-lg shadow p-6 text-center">
+                    <p class="text-gray-500 text-sm">Total Products</p>
+                    <p class="text-4xl font-bold text-gray-800 mt-2">{{ $stats_products['total'] }}</p>
+                </div>
+
+                {{-- Pending --}}
+                <div class="bg-yellow-50 rounded-lg shadow p-6 text-center">
+                    <p class="text-yellow-600 text-sm">Pending</p>
+                    <p class="text-4xl font-bold text-yellow-700 mt-2">{{ $stats_products['pending'] }}</p>
+                </div>
+
+                {{-- In Progress --}}
+                <div class="bg-blue-50 rounded-lg shadow p-6 text-center">
+                    <p class="text-blue-600 text-sm">In Progress</p>
+                    <p class="text-4xl font-bold text-blue-700 mt-2">{{ $stats_products['in_progress'] }}</p>
+                </div>
+
+                {{-- Completed --}}
+                <div class="bg-green-50 rounded-lg shadow p-6 text-center">
+                    <p class="text-green-600 text-sm">Completed</p>
+                    <p class="text-4xl font-bold text-green-700 mt-2">{{ $stats_products['completed'] }}</p>
+                </div>
+
+            </div>
+
+
 
             {{-- Quick Link --}}
             <div class="text-center">
