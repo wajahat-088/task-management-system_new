@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\ActivityLog;
 use App\Http\Requests\ProductRequest;
 
 use Illuminate\Http\Request;
@@ -67,6 +68,9 @@ class ProductController extends Controller
             'created_by' => auth()->id(),
         ]);
 
+        //create an activity log entry for the newly created product
+        ActivityLog::record($product, 'created', "created product '{$product->title}'");
+
         return redirect()->route('products.index')
             ->with('success', 'Product created successfully!');
     }
@@ -94,6 +98,8 @@ class ProductController extends Controller
     public function update(ProductRequest $request, Product $product)
     {
         $product->update($request->validated());
+      //create an activity log entry for the updated product
+        ActivityLog::record($product, 'updated', "updated product '{$product->title}'");
 
         return redirect()->route('products.index')
             ->with('success', 'Product updated successfully!');
@@ -106,6 +112,9 @@ class ProductController extends Controller
     {
         $product->delete();
 
+        //create an activity log entry for the deleted product
+        ActivityLog::record($product, 'deleted', "deleted product '{$product->title}'");
+
         return redirect()->route('products.index')
             ->with('success', 'Product deleted successfully!');
     }
@@ -115,7 +124,13 @@ class ProductController extends Controller
             'status' => 'required|in:pending,in_progress,completed',
         ]);
 
+        $oldStatus = $product->status; //track old status for activity log
+
+
         $product->update(['status' => $validated['status']]);
+        // Activity log entry
+        ActivityLog::record($product, 'status_changed',
+            "changed status of product '{$product->title}' from {$oldStatus} to {$product->status}");
 
         return response()->json([
             'success' => true,
