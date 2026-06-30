@@ -63,7 +63,7 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
-        Product::create([
+       $product= Product::create([
             ...$request->validated(),
             'created_by' => auth()->id(),
         ]);
