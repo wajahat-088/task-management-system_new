@@ -148,8 +148,6 @@ public function index(Request $request)
         $oldStatus = $task->status; // to track prev status for activity log
         $task->update(['status' => $validated['status']]);
 
-        $task->update(['status' => $validated['status']]);
-
         // Activity log entry
         ActivityLog::record($task, 'status_changed',
             "changed status of task '{$task->title}' from {$oldStatus} to {$task->status}");
