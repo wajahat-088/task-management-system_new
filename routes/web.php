@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 // Welcome page
@@ -14,12 +16,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [TaskController::class, 'dashboard'])
          ->name('dashboard');
 
-    // Tasks CRUD (show route nahi chahiye)
+    // Tasks CRUD 
     Route::resource('tasks', TaskController::class)->except(['show']);
+    // Products CRUD
+    Route::resource('products', ProductController::class)->except(['show']);
+    // Categories CRUD
+    Route::resource('categories', CategoryController::class)->except(['show']);
+    
 
-    // AJAX status update — alag route (resource ke bahar)
+    // AJAX status update — alag route 
     Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])
          ->name('tasks.updateStatus');
+
+     // new route for status update for products
+     Route::patch('/products/{product}/status', [ProductController::class, 'updateStatus'])
+         ->name('products.updateStatus');
+         
 
     // // Activity logs page
     // Route::get('/activity-logs', [TaskController::class, 'activityLogs'])

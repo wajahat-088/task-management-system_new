@@ -47,6 +47,31 @@
                    class="ml-4 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
                     Add New Task
                 </a>
+
+            </div>
+
+             <div class="text-center mt-8">
+                <a href="{{ route('categories.index') }}"
+                   class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700">
+                    View All Categories
+                </a>
+                <a href="{{ route('categories.create') }}"
+                   class="ml-4 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
+                    Add New Category
+                </a>
+                
+            </div>
+
+             <div class="text-center mt-8">
+                <a href="{{ route('products.index') }}"
+                   class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700">
+                    View All Products
+                </a>
+                <a href="{{ route('products.create') }}"
+                   class="ml-4 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
+                    Add New Product
+                </a>
+                
             </div>
 
         </div>
