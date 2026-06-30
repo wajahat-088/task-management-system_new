@@ -6,8 +6,12 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
-// Welcome page
-Route::get('/', fn() => view('welcome'));
+// 
+Route::get('/', function () {
+    return auth()->check()
+        ? redirect()->route('dashboard')
+        : redirect()->route('register');
+});
 
 // ─── Auth Protected Routes ───────────────────────────────────────
 Route::middleware(['auth', 'verified'])->group(function () {
