@@ -64,4 +64,11 @@ class Task extends Model
     {
         return $query->where('priority', $priority);
     }
+
+    // Task.php, Product.php, aur Category.php — teeno mein yeh add karein
+
+public function activityLogs()
+{
+    return $this->morphMany(ActivityLog::class, 'loggable');
+}
 }

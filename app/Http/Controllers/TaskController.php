@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use App\Models\Product;
 use App\Http\Requests\TaskRequest;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 
 
@@ -84,6 +85,8 @@ public function index(Request $request)
             ...$request->validated(),
             'created_by' => auth()->id(),
         ]);
+       //create an activity log entry for the newly created task
+        ActivityLog::record($task, 'created', "created task '{$task->title}'");
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
@@ -112,6 +115,9 @@ public function index(Request $request)
     {
         $task->update($request->validated());
 
+        //create an activity log entry for the updated task
+         ActivityLog::record($task, 'updated', "updated task '{$task->title}'");
+
         return redirect()->route('tasks.index')
             ->with('success', 'Task updated successfully!');
     }
@@ -123,6 +129,8 @@ public function index(Request $request)
     {
         $task->delete();
 
+        //create an activity log entry for the deleted task
+        ActivityLog::record($task, 'deleted', "deleted task '{$task->title}'");
         return redirect()->route('tasks.index')
             ->with('success', 'Task deleted successfully!');
     }
@@ -137,7 +145,14 @@ public function index(Request $request)
             'status' => 'required|in:pending,in_progress,completed',
         ]);
 
+        $oldStatus = $task->status; // to track prev status for activity log
         $task->update(['status' => $validated['status']]);
+
+        $task->update(['status' => $validated['status']]);
+
+        // Activity log entry
+        ActivityLog::record($task, 'status_changed',
+            "changed status of task '{$task->title}' from {$oldStatus} to {$task->status}");
 
         return response()->json([
             'success' => true,

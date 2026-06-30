@@ -104,6 +104,14 @@
                 </a>
                 
             </div>
+            <div class="text-center mt-8">
+                <a href="{{ route('activity-logs.index') }}"
+                   class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700">
+                    View Activity Logs
+                </a>
+                
+                
+            </div>
 
         </div>
     </div>

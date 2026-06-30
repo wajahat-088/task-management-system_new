@@ -2,11 +2,18 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">All Tasks</h2>
+             
             <a href="{{ route('tasks.create') }}"
                class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
                 + Add Task
             </a>
+
         </div>
+        <div class="flex justify-end mt-3"><a href="{{ route('activity-logs.index') }}"
+               class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                View Activity Logs
+            </a>
+         </div>
     </x-slot>
 
     <div class="py-12">
