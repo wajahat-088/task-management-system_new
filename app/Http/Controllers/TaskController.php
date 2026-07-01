@@ -5,19 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use App\Models\Product;
 use App\Http\Requests\TaskRequest;
-use App\Models\ActivityLog;
+use App\Repositories\Interfaces\TaskRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
-
-
-
 class TaskController extends Controller implements HasMiddleware
 {
+    /**
+     * We depend on the interface here, not the concrete Eloquent repository.
+     * This keeps the controller decoupled from how/where task data is actually stored,
+     * so the data source can be swapped later without touching this class.
+     */
+    public function __construct(protected TaskRepositoryInterface $taskRepository)
+    {
+    }
 
     /**
-     * constructor to apply middleware for permissions
+     * Route-level permission checks.
+     * Each middleware entry maps a Spatie permission to the specific
+     * controller method(s) it should protect.
      */
     public static function middleware(): array
     {
@@ -28,17 +35,18 @@ class TaskController extends Controller implements HasMiddleware
             new Middleware('can:delete-task',  only: ['destroy']),
         ];
     }
+
     /**
-     * Display the dashboard with task statistics.
+     * Show the dashboard with quick stats for tasks and products.
      */
     public function dashboard()
     {
-        $stats_tasks = [
-            'total'       => Task::count(),
-            'pending'     => Task::where('status', 'pending')->count(),
-            'in_progress' => Task::where('status', 'in_progress')->count(),
-            'completed'   => Task::where('status', 'completed')->count(),
-        ];
+        // Task stats now come from the repository instead of raw Eloquent calls.
+        $stats_tasks = $this->taskRepository->getStats();
+
+        // Product stats are still queried directly for now.
+        // TODO: move this to a ProductRepository once it's created,
+        // to keep the pattern consistent across the app.
         $stats_products = [
             'total'       => Product::count(),
             'pending'     => Product::where('status', 'pending')->count(),
@@ -50,37 +58,29 @@ class TaskController extends Controller implements HasMiddleware
     }
 
     /**
- * Display a paginated, searchable, filterable, and sortable list of tasks.
- */
-public function index(Request $request)
-{
-    $query = Task::with('creator');
+     * Display a paginated, searchable, filterable, and sortable list of tasks.
+     * All the actual query building (search, filters, sorting, pagination)
+     * happens inside the repository — this method just prepares the request input.
+     */
+    public function index(Request $request)
+    {
+        // Whitelist sortable columns to prevent sorting on arbitrary/unsafe columns.
+        $sortColumn = in_array($request->sort, ['title', 'priority', 'status', 'due_date', 'created_at'])
+            ? $request->sort
+            : 'created_at';
 
-    if ($request->filled('search')) {
-        $query->search($request->search);
+        // Default to descending order unless the user explicitly asked for ascending.
+        $sortDirection = $request->direction === 'asc' ? 'asc' : 'desc';
+
+        // Pass only the filter-related inputs to the repository.
+        $tasks = $this->taskRepository->getPaginated(
+            filters: $request->only(['search', 'status', 'priority']),
+            sortColumn: $sortColumn,
+            sortDirection: $sortDirection,
+        );
+
+        return view('tasks.index', compact('tasks', 'sortColumn', 'sortDirection'));
     }
-
-    if ($request->filled('status')) {
-        $query->filterStatus($request->status);
-    }
-
-    if ($request->filled('priority')) {
-        $query->filterPriority($request->priority);
-    }
-
-    // Only allow sorting on these specific columns (prevents arbitrary column injection)
-    $sortColumn = in_array($request->sort, ['title', 'priority', 'status', 'due_date', 'created_at'])
-        ? $request->sort
-        : 'created_at';
-
-    $sortDirection = $request->direction === 'asc' ? 'asc' : 'desc';
-
-    $query->orderBy($sortColumn, $sortDirection);
-
-    $tasks = $query->paginate(10)->withQueryString();
-
-    return view('tasks.index', compact('tasks', 'sortColumn', 'sortDirection'));
-}
 
     /**
      * Show the form for creating a new task.
@@ -91,22 +91,20 @@ public function index(Request $request)
     }
 
     /**
-     * Store a newly created task in the database.
-     * Supports both standard form submission and AJAX requests.
+     * Store a newly created task.
+     * Supports both a normal form submission and an AJAX/JSON request.
      */
     public function store(TaskRequest $request)
     {
-        $task = Task::create([
-            ...$request->validated(),
-            'created_by' => auth()->id(),
-        ]);
-       //create an activity log entry for the newly created task
-        ActivityLog::record($task, 'created', "created task '{$task->title}'");
+        // Repository handles creation and the related activity log entry internally,
+        // so this method stays focused purely on the HTTP response.
+        $task = $this->taskRepository->create($request->validated());
 
+        // Return JSON for AJAX calls, otherwise fall back to a normal redirect.
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
-                'success' => true,
-                'message' => 'Task created successfully!',
+                'success'  => true,
+                'message'  => 'Task created successfully!',
                 'redirect' => route('tasks.index'),
             ]);
         }
@@ -116,7 +114,8 @@ public function index(Request $request)
     }
 
     /**
-     * Show the form for editing the specified task.
+     * Show the form for editing an existing task.
+     * $task is resolved automatically via route model binding.
      */
     public function edit(Task $task)
     {
@@ -124,48 +123,44 @@ public function index(Request $request)
     }
 
     /**
-     * Update the specified task in the database.
+     * Update an existing task with validated data.
      */
     public function update(TaskRequest $request, Task $task)
     {
-        $task->update($request->validated());
-
-        //create an activity log entry for the updated task
-         ActivityLog::record($task, 'updated', "updated task '{$task->title}'");
+        // Update logic + activity logging is handled inside the repository.
+        $this->taskRepository->update($task, $request->validated());
 
         return redirect()->route('tasks.index')
             ->with('success', 'Task updated successfully!');
     }
 
     /**
-     * Remove the specified task from the database.
+     * Delete a task.
      */
     public function destroy(Task $task)
     {
-        $task->delete();
+        // Deletion + activity logging is handled inside the repository.
+        $this->taskRepository->delete($task);
 
-        //create an activity log entry for the deleted task
-        ActivityLog::record($task, 'deleted', "deleted task '{$task->title}'");
         return redirect()->route('tasks.index')
             ->with('success', 'Task deleted successfully!');
     }
 
     /**
-     * Update only the status of a task via AJAX.
+     * Update only the status of a task via an AJAX request.
      * Route: PATCH /tasks/{task}/status
      */
     public function updateStatus(Request $request, Task $task)
     {
+        // Only the status field is accepted here — nothing else can be changed
+        // through this endpoint.
         $validated = $request->validate([
             'status' => 'required|in:pending,in_progress,completed',
         ]);
 
-        $oldStatus = $task->status; // to track prev status for activity log
-        $task->update(['status' => $validated['status']]);
-
-        // Activity log entry
-        ActivityLog::record($task, 'status_changed',
-            "changed status of task '{$task->title}' from {$oldStatus} to {$task->status}");
+        // Repository takes care of updating the status and logging the change
+        // (including the old -> new status transition).
+        $task = $this->taskRepository->updateStatus($task, $validated['status']);
 
         return response()->json([
             'success' => true,
