@@ -2,18 +2,25 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">All Tasks</h2>
-             
-            <a href="{{ route('tasks.create') }}"
-               class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-                + Add Task
-            </a>
 
+            {{-- Sirf woh user dekhe jiske paas create-task permission ho --}}
+            @can('create-task')
+                <a href="{{ route('tasks.create') }}"
+                   class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                    + Add Task
+                </a>
+            @endcan
         </div>
-        <div class="flex justify-end mt-3"><a href="{{ route('activity-logs.index') }}"
-               class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-                View Activity Logs
-            </a>
-         </div>
+
+        {{-- only show to users with view-activity-logs permission --}}
+        @can('view-activity-logs')
+            <div class="flex justify-end mt-3">
+                <a href="{{ route('activity-logs.index') }}"
+                   class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                    View Activity Logs
+                </a>
+            </div>
+        @endcan
     </x-slot>
 
     <div class="py-12">
@@ -24,12 +31,10 @@
                 <form method="GET" action="{{ route('tasks.index') }}"
                       class="flex flex-wrap gap-3">
 
-                    {{-- Search by title --}}
                     <input type="text" name="search" placeholder="Search by title..."
                            value="{{ request('search') }}"
                            class="border rounded px-3 py-2 flex-1 min-w-[200px]">
 
-                    {{-- Status filter --}}
                     <select name="status" class="border rounded px-8 py-2">
                         <option value="">All Status</option>
                         <option value="pending"     {{ request('status') == 'pending'     ? 'selected' : '' }}>Pending</option>
@@ -37,7 +42,6 @@
                         <option value="completed"   {{ request('status') == 'completed'   ? 'selected' : '' }}>Completed</option>
                     </select>
 
-                    {{-- Priority filter --}}
                     <select name="priority" class="border rounded px-8 py-2">
                         <option value="">All Priority</option>
                         <option value="low"    {{ request('priority') == 'low'    ? 'selected' : '' }}>Low</option>
@@ -59,40 +63,40 @@
             {{-- Tasks Table --}}
             <div class="bg-white rounded-lg shadow overflow-hidden">
                 <table class="w-full text-sm">
-                   <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
-    <tr>
-        @php
-            $columns = [
-                'title'      => 'Title',
-                'priority'   => 'Priority',
-                'status'     => 'Status',
-                'due_date'   => 'Due Date',
-            ];
-        @endphp
+                    <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+                        <tr>
+                            @php
+                                $columns = [
+                                    'title'    => 'Title',
+                                    'priority' => 'Priority',
+                                    'status'   => 'Status',
+                                    'due_date' => 'Due Date',
+                                ];
+                            @endphp
 
-        @foreach($columns as $column => $label)
-            <th class="px-6 py-3 text-left">
-                <a href="{{ route('tasks.index', array_merge(request()->query(), [
-                        'sort' => $column,
-                        'direction' => ($sortColumn === $column && $sortDirection === 'asc') ? 'desc' : 'asc',
-                    ])) }}"
-                   class="flex items-center gap-1 hover:text-gray-900">
-                    {{ $label }}
-                    @if($sortColumn === $column)
-                        @if($sortDirection === 'asc')
-                            <span>↑</span>
-                        @else
-                            <span>↓</span>
-                        @endif
-                    @endif
-                </a>
-            </th>
-        @endforeach
+                            @foreach($columns as $column => $label)
+                                <th class="px-6 py-3 text-left">
+                                    <a href="{{ route('tasks.index', array_merge(request()->query(), [
+                                            'sort'      => $column,
+                                            'direction' => ($sortColumn === $column && $sortDirection === 'asc') ? 'desc' : 'asc',
+                                        ])) }}"
+                                       class="flex items-center gap-1 hover:text-gray-900">
+                                        {{ $label }}
+                                        @if($sortColumn === $column)
+                                            @if($sortDirection === 'asc')
+                                                <span>↑</span>
+                                            @else
+                                                <span>↓</span>
+                                            @endif
+                                        @endif
+                                    </a>
+                                </th>
+                            @endforeach
 
-        <th class="px-6 py-3 text-left">Created By</th>
-        <th class="px-6 py-3 text-left">Actions</th>
-    </tr>
-</thead>
+                            <th class="px-6 py-3 text-left">Created By</th>
+                            <th class="px-6 py-3 text-left">Actions</th>
+                        </tr>
+                    </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse($tasks as $task)
                         <tr class="hover:bg-gray-50">
@@ -109,19 +113,29 @@
                                 @endif
                             </td>
 
-                            {{-- Status — Editable AJAX Dropdown --}}
+                            {{-- Status — if have edit permission then show dropdown for ajax request. --}}
                             <td class="px-6 py-4">
-                                <select
-                                    class="status-select text-xs border rounded px-6 py-1 cursor-pointer
+                                @can('edit-task')
+                                    <select
+                                        class="status-select text-xs border rounded px-6 py-1 cursor-pointer
+                                            @if($task->status == 'completed') bg-green-100 text-green-700
+                                            @elseif($task->status == 'in_progress') bg-blue-100 text-blue-700
+                                            @else bg-yellow-100 text-yellow-700 @endif"
+                                        data-task-id="{{ $task->id }}"
+                                        data-url="{{ route('tasks.updateStatus', $task) }}">
+                                        <option value="pending"     {{ $task->status == 'pending'     ? 'selected' : '' }}>Pending</option>
+                                        <option value="in_progress" {{ $task->status == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                        <option value="completed"   {{ $task->status == 'completed'   ? 'selected' : '' }}>Completed</option>
+                                    </select>
+                                @else
+                                    {{-- User role — sirf status text dikhe, dropdown nahi --}}
+                                    <span class="text-xs px-2 py-1 rounded
                                         @if($task->status == 'completed') bg-green-100 text-green-700
                                         @elseif($task->status == 'in_progress') bg-blue-100 text-blue-700
-                                        @else bg-yellow-100 text-yellow-700 @endif"
-                                    data-task-id="{{ $task->id }}"
-                                    data-url="{{ route('tasks.updateStatus', $task) }}">
-                                    <option value="pending"     {{ $task->status == 'pending'     ? 'selected' : '' }}>Pending</option>
-                                    <option value="in_progress" {{ $task->status == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                                    <option value="completed"   {{ $task->status == 'completed'   ? 'selected' : '' }}>Completed</option>
-                                </select>
+                                        @else bg-yellow-100 text-yellow-700 @endif">
+                                        {{ ucfirst(str_replace('_', ' ', $task->status)) }}
+                                    </span>
+                                @endcan
                             </td>
 
                             <td class="px-6 py-4">{{ $task->due_date }}</td>
@@ -130,20 +144,36 @@
                             {{-- Actions --}}
                             <td class="px-6 py-4">
                                 <div class="flex gap-2">
-                                    <a href="{{ route('tasks.edit', $task) }}"
-                                       class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600">
-                                        Edit
-                                    </a>
-                                    <form method="POST"
-                                          action="{{ route('tasks.destroy', $task) }}"
-                                          onsubmit="return confirm('Delete this task?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                                class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600">
-                                            Delete
-                                        </button>
-                                    </form>
+
+                                    {{-- if have edit permission --}}
+                                    @can('edit-task')
+                                        <a href="{{ route('tasks.edit', $task) }}"
+                                           class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600">
+                                            Edit
+                                        </a>
+                                    @endcan
+
+                                    {{-- if have delete permission show only delete button --}}
+                                    @can('delete-task')
+                                        <form method="POST"
+                                              action="{{ route('tasks.destroy', $task) }}"
+                                              onsubmit="return confirm('Delete this task?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    @endcan
+
+                                    {{-- if no permission found show --}}
+                                    @cannot('edit-task')
+                                        @cannot('delete-task')
+                                            <span class="text-gray-400 text-xs">—</span>
+                                        @endcannot
+                                    @endcannot
+
                                 </div>
                             </td>
                         </tr>
@@ -157,7 +187,6 @@
                     </tbody>
                 </table>
 
-                {{-- Pagination --}}
                 @if($tasks->hasPages())
                 <div class="px-6 py-4 border-t">
                     {{ $tasks->links() }}
@@ -168,40 +197,30 @@
         </div>
     </div>
 
-    {{-- Toast Notification Container --}}
+    {{-- Toast --}}
     <div id="toast"
          class="fixed top-5 right-5 hidden px-4 py-3 rounded shadow-lg text-white text-sm z-50">
     </div>
 
     <script>
-        // Show success toast if redirected here with a session flash message
         @if(session('success'))
             document.addEventListener('DOMContentLoaded', () => {
                 showToast(@json(session('success')), 'success');
             });
         @endif
 
-        /**
-         * Display a toast notification on screen for 3 seconds.
-         */
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.className = `fixed top-5 right-5 px-4 py-3 rounded shadow-lg text-white text-sm z-50
                 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
             toast.classList.remove('hidden');
-
             setTimeout(() => toast.classList.add('hidden'), 3000);
         }
 
-        /**
-         * Handle AJAX-based task status update from the dropdown,
-         * without requiring a full page reload.
-         */
         document.querySelectorAll('.status-select').forEach(select => {
             select.addEventListener('change', function () {
                 const url = this.dataset.url;
-
                 fetch(url, {
                     method: 'PATCH',
                     headers: {

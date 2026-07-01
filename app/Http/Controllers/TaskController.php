@@ -7,12 +7,27 @@ use App\Models\Product;
 use App\Http\Requests\TaskRequest;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
 
 
 
-class TaskController extends Controller
+class TaskController extends Controller implements HasMiddleware
 {
+
+    /**
+     * constructor to apply middleware for permissions
+     */
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('can:view-task',    only: ['index']),
+            new Middleware('can:create-task',  only: ['create', 'store']),
+            new Middleware('can:edit-task',    only: ['edit', 'update', 'updateStatus']),
+            new Middleware('can:delete-task',  only: ['destroy']),
+        ];
+    }
     /**
      * Display the dashboard with task statistics.
      */

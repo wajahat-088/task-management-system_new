@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return auth()->check()
         ? redirect()->route('dashboard')
-        : redirect()->route('register');
+        : redirect()->route('login'); // register ki jagah login
 });
 
 // ─── Auth Protected Routes ───────────────────────────────────────

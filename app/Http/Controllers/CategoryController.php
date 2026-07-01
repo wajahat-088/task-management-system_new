@@ -5,9 +5,24 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Http\Requests\CategoryRequest;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class CategoryController extends Controller
+class CategoryController extends Controller implements HasMiddleware
 {
+    /**
+     * constructor to apply middleware for permissions
+     */
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('can:view-category',   only: ['index']),
+            new Middleware('can:create-category', only: ['create', 'store']),
+            new Middleware('can:edit-category',   only: ['edit', 'update']),
+            new Middleware('can:delete-category', only: ['destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */

@@ -7,9 +7,23 @@ use App\Models\ActivityLog;
 use App\Http\Requests\ProductRequest;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ProductController extends Controller
+class ProductController extends Controller implements HasMiddleware
 {
+    /**
+     * constructor to apply middleware for permissions
+     */
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('can:view-product',   only: ['index']),
+            new Middleware('can:create-product', only: ['create', 'store']),
+            new Middleware('can:edit-product',   only: ['edit', 'update', 'updateStatus']),
+            new Middleware('can:delete-product', only: ['destroy']),
+        ];
+    }
     /**
      * Display a listing of the resource.
      */

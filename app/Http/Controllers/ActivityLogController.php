@@ -4,9 +4,21 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ActivityLogController extends Controller
+class ActivityLogController extends Controller implements HasMiddleware
 {
+    /**
+     * constructor to apply middleware for permissions
+     */
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('can:view-activity-logs', only: ['index']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
