@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Http\Requests\CategoryRequest;
+use App\Repositories\Interfaces\CategoryRepositoryInterface;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
 class CategoryController extends Controller implements HasMiddleware
 {
+    public function __construct(protected CategoryRepositoryInterface $categoryRepository)
+    {
+    }
+
     /**
-     * constructor to apply middleware for permissions
+     * Route-level permission checks.
      */
     public static function middleware(): array
     {
@@ -24,36 +28,36 @@ class CategoryController extends Controller implements HasMiddleware
     }
 
     /**
-     * Display a listing of the resource.
+     * Display a paginated listing of categories with their products count.
      */
     public function index()
     {
-        $categories = Category::withCount('products')->latest()->paginate(10);
+        $categories = $this->categoryRepository->getPaginated();
 
         return view('categories.index', compact('categories'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new category.
      */
-   public function create()
+    public function create()
     {
         return view('categories.create');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created category.
      */
     public function store(CategoryRequest $request)
     {
-        Category::create($request->validated());
+        $this->categoryRepository->create($request->validated());
 
         return redirect()->route('categories.index')
             ->with('success', 'Category created successfully!');
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified category.
      */
     public function show(string $id)
     {
@@ -61,7 +65,7 @@ class CategoryController extends Controller implements HasMiddleware
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified category.
      */
     public function edit(Category $category)
     {
@@ -69,23 +73,22 @@ class CategoryController extends Controller implements HasMiddleware
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified category.
      */
     public function update(CategoryRequest $request, Category $category)
     {
-        $category->update($request->validated());
+        $this->categoryRepository->update($category, $request->validated());
 
         return redirect()->route('categories.index')
             ->with('success', 'Category updated successfully!');
     }
 
-
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified category.
      */
     public function destroy(Category $category)
     {
-        $category->delete();
+        $this->categoryRepository->delete($category);
 
         return redirect()->route('categories.index')
             ->with('success', 'Category deleted successfully!');

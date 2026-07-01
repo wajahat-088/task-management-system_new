@@ -51,6 +51,7 @@ class TaskRepository implements TaskRepositoryInterface
 
     public function create(array $data): Task
     {
+        
         $task = $this->model->create([
             ...$data,
             'created_by' => auth()->id(),
