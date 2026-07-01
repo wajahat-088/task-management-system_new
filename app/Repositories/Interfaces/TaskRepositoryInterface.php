@@ -41,4 +41,9 @@ interface TaskRepositoryInterface
      * Update only the status of a task.
      */
     public function updateStatus(Task $task, string $status): Task;
+
+    /**
+     * Get product stats (used on dashboard).
+     */
+    
 }
