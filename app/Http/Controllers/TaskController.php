@@ -12,11 +12,7 @@ use Illuminate\Routing\Controllers\Middleware;
 
 class TaskController extends Controller implements HasMiddleware
 {
-    /**
-     * We depend on the interface here, not the concrete Eloquent repository.
-     * This keeps the controller decoupled from how/where task data is actually stored,
-     * so the data source can be swapped later without touching this class.
-     */
+    
     public function __construct(protected TaskRepositoryInterface $taskRepository)
     {
     }
