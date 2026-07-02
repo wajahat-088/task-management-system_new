@@ -43,5 +43,12 @@ class User extends Authenticatable
     /**
      * Is user ke saare activity logs
      */
+
+    
+
+    public function fcmTokens()
+    {
+        return $this->hasMany(FcmToken::class);
+    }
     
 }

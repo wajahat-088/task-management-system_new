@@ -19,6 +19,12 @@ class Task extends Model
         'priority',
         'due_date',
         'created_by',
+        'due_reminder_sent_at', 
+    ];
+
+    protected $casts = [
+    'due_date' => 'datetime',
+    'due_reminder_sent_at' => 'datetime',
     ];
 
     /*
@@ -67,8 +73,14 @@ class Task extends Model
 
     // Task.php, Product.php, aur Category.php — teeno mein yeh add karein
 
-public function activityLogs()
-{
-    return $this->morphMany(ActivityLog::class, 'loggable');
-}
+    public function activityLogs()
+    {
+        return $this->morphMany(ActivityLog::class, 'loggable');
+    }
+
+    //  task overdue 
+    public function isOverdue(): bool
+    {
+        return $this->due_date < now() && $this->status !== 'completed';
+    }
 }

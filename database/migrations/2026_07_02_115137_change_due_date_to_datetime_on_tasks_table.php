@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('tasks', function (Blueprint $table) {
+            // date se dateTime mein convert kar rahe hain
+            $table->dateTime('due_date')->change();
+
+            // Track karega k due-reminder (2hr wala) bheja gaya ya nahi
+            $table->timestamp('due_reminder_sent_at')->nullable()->after('due_date');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('tasks', function (Blueprint $table) {
+            $table->date('due_date')->change();
+            $table->dropColumn('due_reminder_sent_at');
+        });
+    }
+};
