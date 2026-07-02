@@ -11,9 +11,7 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     /**
-     * Login and return a Sanctum API token.
-     * This does NOT use Breeze's session login — it's a stateless
-     * token-based login meant purely for API consumers like Postman.
+     * Login and generate a new token for the user.
      */
     public function login(Request $request)
     {
@@ -30,7 +28,7 @@ class AuthController extends Controller
             ]);
         }
 
-        // Purana token (agar same naam ka) revoke kar dein, phir naya banayen
+        // Revoke any existing tokens for this user with the same name
         $user->tokens()->where('name', 'postman-token')->delete();
 
         $token = $user->createToken('postman-token')->plainTextToken;

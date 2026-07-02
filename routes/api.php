@@ -4,10 +4,10 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\TaskApiController;
 use Illuminate\Support\Facades\Route;
 
-// Public route — koi token nahi chahiye, sirf email/password
+// Public route — 
 Route::post('/login', [AuthController::class, 'login']);
 
-// Protected routes — Sanctum token chahiye
+// Protected routes — need Sanctum token in Authorization header
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);

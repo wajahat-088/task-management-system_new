@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class TaskApiController extends Controller
 {
-    // Wahi interface jo web TaskController use kar raha hai
+    // Same as TaskController, but uses TaskRepositoryInterface for data access and returns JSON responses instead of views.
     public function __construct(protected TaskRepositoryInterface $taskRepository)
     {
     }
