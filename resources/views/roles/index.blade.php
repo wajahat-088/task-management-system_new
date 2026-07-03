@@ -22,11 +22,11 @@
                                 {{ $role->permissions->pluck('name')->implode(', ') ?: '—' }}
                             </td>
                             <td class="px-6 py-4">
-                                <a href="{{ route('roles.edit', $role) }}"
-                                   class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600">
-                                    Edit Permissions
-                                </a>
-                            </td>
+                            <a href="{{ route('roles.edit', $role) }}"
+                            class="inline-block bg-blue-500 text-white px-3 py-1.5 rounded text-xs whitespace-nowrap hover:bg-blue-600">
+                                Edit Permissions
+                            </a>
+                        </td>
                         </tr>
                         @endforeach
                     </tbody>
