@@ -26,6 +26,9 @@ class RolePermissionSeeder extends Seeder
 
             // Activity logs
             'view-activity-logs',
+
+            'manage-roles',
+            'manage-users',
         ];
 
         foreach ($permissions as $permission) {

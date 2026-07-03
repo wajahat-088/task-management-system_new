@@ -108,5 +108,29 @@
             @endcan
 
         </div>
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            {{-- NAYA: Roles & Permissions quick links — sirf admin ko dikhega --}}
+            <div class="text-center mt-8">
+                    <a href="{{ route('profile.edit') }}"
+                       class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700">
+                        Edit Current User Profile
+                    </a>
+                </div>
+            @can('manage-roles')
+                <div class="text-center mt-8">
+                    <a href="{{ route('roles.index') }}"
+                       class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700">
+                        Manage Roles & Permissions
+                    </a>
+
+                    @can('manage-users')
+                        <a href="{{ route('users.index') }}"
+                           class="ml-4 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700">
+                            Manage Users
+                        </a>
+                    @endcan
+                </div>
+            @endcan
+        </div>
     </div>
 </x-app-layout>

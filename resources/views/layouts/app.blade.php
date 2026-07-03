@@ -33,5 +33,25 @@
                 {{ $slot }}
             </main>
         </div>
+        <div id="toast"
+             class="fixed top-5 right-5 hidden px-4 py-3 rounded shadow-lg text-white text-sm z-50">
+        </div>
+
+        <script>
+            function showToast(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.className = `fixed top-5 right-5 px-4 py-3 rounded shadow-lg text-white text-sm z-50
+                    ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
+                toast.classList.remove('hidden');
+                setTimeout(() => toast.classList.add('hidden'), 3000);
+            }
+
+            @if(session('success'))
+                document.addEventListener('DOMContentLoaded', () => {
+                    showToast(@json(session('success')), 'success');
+                });
+            @endif
+        </script>
     </body>
 </html>
