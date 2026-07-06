@@ -548,7 +548,7 @@ button {
 
 .form-input:focus,
 .form-select:focus {
-    outline: 2px solid #29c333!important;
+    outline: 1px solid #29c333!important;
     outline-offset: 0px!important;
     border-color: #29c333 !important;
 }
