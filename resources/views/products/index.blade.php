@@ -1,12 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">All Products</h2>
+        <div class="header-row">
+            <h2 class="header-title">All Products</h2>
 
             {{-- Only visible to users with create-product permission --}}
             @can('create-product')
-                <a href="{{ route('products.create') }}"
-                   class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                <a href="{{ route('products.create') }}" class="btn btn--primary">
                     + Add Product
                 </a>
             @endcan
@@ -14,30 +13,28 @@
 
         {{-- Only visible to users with view-activity-logs permission --}}
         @can('view-activity-logs')
-            <div class="flex justify-end mt-3">
-                <a href="{{ route('activity-logs.index') }}"
-                   class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+            <div class="header-actions-row">
+                <a href="{{ route('activity-logs.index') }}" class="btn btn--primary">
                     View Activity Logs
                 </a>
             </div>
         @endcan
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="page-content">
+        <div class="page-container">
 
             {{-- Search and Filter Form --}}
-            <div class="bg-white rounded-lg shadow p-4 mb-6">
-                <form method="GET" action="{{ route('products.index') }}"
-                      class="flex flex-wrap gap-3">
+            <div class="filter-card">
+                <form method="GET" action="{{ route('products.index') }}" class="filter-form">
 
                     {{-- Search by title --}}
                     <input type="text" name="search" placeholder="Search by title..."
                            value="{{ request('search') }}"
-                           class="border rounded px-3 py-2 flex-1 min-w-[200px]">
+                           class="form-input form-input--grow">
 
                     {{-- Filter by status --}}
-                    <select name="status" class="border rounded px-8 py-2">
+                    <select name="status" class="form-select">
                         <option value="">All Status</option>
                         <option value="pending"     {{ request('status') == 'pending'     ? 'selected' : '' }}>Pending</option>
                         <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
@@ -45,30 +42,28 @@
                     </select>
 
                     {{-- Filter by priority --}}
-                    <select name="priority" class="border rounded px-8 py-2">
+                    <select name="priority" class="form-select">
                         <option value="">All Priority</option>
                         <option value="low"    {{ request('priority') == 'low'    ? 'selected' : '' }}>Low</option>
                         <option value="medium" {{ request('priority') == 'medium' ? 'selected' : '' }}>Medium</option>
                         <option value="high"   {{ request('priority') == 'high'   ? 'selected' : '' }}>High</option>
                     </select>
 
-                    <button type="submit"
-                            class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                    <button type="submit" class="btn btn--primary">
                         Filter
                     </button>
 
                     {{-- Reset all filters --}}
-                    <a href="{{ route('products.index') }}"
-                       class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">
+                    <a href="{{ route('products.index') }}" class="btn btn--secondary">
                         Reset
                     </a>
                 </form>
             </div>
 
             {{-- Products Table --}}
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+            <div class="table-card">
+                <table class="data-table">
+                    <thead>
                         <tr>
                             {{-- Sortable column headers --}}
                             @php
@@ -81,55 +76,59 @@
                             @endphp
 
                             @foreach($columns as $column => $label)
-                                <th class="px-6 py-3 text-left">
+                                <th>
                                     <a href="{{ route('products.index', array_merge(request()->query(), [
                                             'sort'      => $column,
                                             'direction' => ($sortColumn === $column && $sortDirection === 'asc') ? 'desc' : 'asc',
                                         ])) }}"
-                                       class="flex items-center gap-1 hover:text-gray-900">
+                                       class="sort-link">
                                         {{ $label }}
                                         {{-- Show sort direction arrow for the active column --}}
                                         @if($sortColumn === $column)
                                             @if($sortDirection === 'asc')
-                                                <span>↑</span>
+                                                <span>&uarr;</span>
                                             @else
-                                                <span>↓</span>
+                                                <span>&darr;</span>
                                             @endif
                                         @endif
                                     </a>
                                 </th>
                             @endforeach
 
-                            <th class="px-6 py-3 text-left">Category</th>
-                            <th class="px-6 py-3 text-left">Created By</th>
-                            <th class="px-6 py-3 text-left">Actions</th>
+                            <th>Category</th>
+                            <th>Created By</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody>
                         @forelse($products as $product)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 font-medium">{{ $product->title }}</td>
+                        <tr>
+                            <td>{{ $product->title }}</td>
 
                             {{-- Priority badge with color coding --}}
-                            <td class="px-6 py-4">
+                            <td>
                                 @if($product->priority == 'high')
-                                    <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">High</span>
+                                    <span class="badge badge--danger">High</span>
                                 @elseif($product->priority == 'medium')
-                                    <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs">Medium</span>
+                                    <span class="badge badge--warning">Medium</span>
                                 @else
-                                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Low</span>
+                                    <span class="badge badge--success">Low</span>
                                 @endif
                             </td>
 
                             {{-- Status: show editable dropdown for users with edit permission,
                                  otherwise show a read-only colored badge --}}
-                            <td class="px-6 py-4">
+                            <td>
                                 @can('edit-product')
+                                    @php
+                                        $statusModifier = match($product->status) {
+                                            'completed'   => 'status-select--completed',
+                                            'in_progress' => 'status-select--progress',
+                                            default       => 'status-select--pending',
+                                        };
+                                    @endphp
                                     <select
-                                        class="status-select text-xs border rounded px-6 py-1 cursor-pointer
-                                            @if($product->status == 'completed') bg-green-100 text-green-700
-                                            @elseif($product->status == 'in_progress') bg-blue-100 text-blue-700
-                                            @else bg-yellow-100 text-yellow-700 @endif"
+                                        class="status-select {{ $statusModifier }}"
                                         data-product-id="{{ $product->id }}"
                                         data-url="{{ route('products.updateStatus', $product) }}">
                                         <option value="pending"     {{ $product->status == 'pending'     ? 'selected' : '' }}>Pending</option>
@@ -137,29 +136,29 @@
                                         <option value="completed"   {{ $product->status == 'completed'   ? 'selected' : '' }}>Completed</option>
                                     </select>
                                 @else
-                                    <span class="text-xs px-2 py-1 rounded
-                                        @if($product->status == 'completed') bg-green-100 text-green-700
-                                        @elseif($product->status == 'in_progress') bg-blue-100 text-blue-700
-                                        @else bg-yellow-100 text-yellow-700 @endif">
-                                        {{ ucfirst(str_replace('_', ' ', $product->status)) }}
-                                    </span>
+                                    @if($product->status == 'completed')
+                                        <span class="badge badge--success">{{ ucfirst(str_replace('_', ' ', $product->status)) }}</span>
+                                    @elseif($product->status == 'in_progress')
+                                        <span class="badge badge--info">{{ ucfirst(str_replace('_', ' ', $product->status)) }}</span>
+                                    @else
+                                        <span class="badge badge--warning">{{ ucfirst(str_replace('_', ' ', $product->status)) }}</span>
+                                    @endif
                                 @endcan
                             </td>
 
-                            <td class="px-6 py-4">{{ $product->due_date }}</td>
+                            <td>{{ $product->due_date }}</td>
 
                             {{-- Show category name or dash if not assigned --}}
-                            <td class="px-6 py-4">{{ $product->category->name ?? '—' }}</td>
-                            <td class="px-6 py-4">{{ $product->creator->name }}</td>
+                            <td>{{ $product->category->name ?? '—' }}</td>
+                            <td>{{ $product->creator->name }}</td>
 
                             {{-- Action buttons — shown based on user permissions --}}
-                            <td class="px-6 py-4">
-                                <div class="flex gap-2">
+                            <td>
+                                <div class="row-actions">
 
                                     {{-- Edit button: visible to users with edit-product permission --}}
                                     @can('edit-product')
-                                        <a href="{{ route('products.edit', $product) }}"
-                                           class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600">
+                                        <a href="{{ route('products.edit', $product) }}" class="btn-sm btn-sm--edit">
                                             Edit
                                         </a>
                                     @endcan
@@ -171,8 +170,7 @@
                                               onsubmit="return confirm('Delete this product?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
-                                                    class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600">
+                                            <button type="submit" class="btn-sm btn-sm--delete">
                                                 Delete
                                             </button>
                                         </form>
@@ -181,7 +179,7 @@
                                     {{-- Show dash if user has neither edit nor delete permission --}}
                                     @cannot('edit-product')
                                         @cannot('delete-product')
-                                            <span class="text-gray-400 text-xs">—</span>
+                                            <span class="no-action">&mdash;</span>
                                         @endcannot
                                     @endcannot
 
@@ -190,7 +188,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-8 text-center text-gray-400">
+                            <td colspan="8" class="empty-row">
                                 No products found.
                             </td>
                         </tr>
@@ -200,7 +198,7 @@
 
                 {{-- Pagination links --}}
                 @if($products->hasPages())
-                <div class="px-6 py-4 border-t">
+                <div class="table-footer">
                     {{ $products->links() }}
                 </div>
                 @endif
@@ -210,9 +208,7 @@
     </div>
 
     {{-- Toast notification container --}}
-    <div id="toast"
-         class="fixed top-5 right-5 hidden px-4 py-3 rounded shadow-lg text-white text-sm z-50">
-    </div>
+    <div id="toast" class="toast"></div>
 
     <script>
         // Show success toast if redirected with a session flash message
@@ -226,10 +222,10 @@
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
-            toast.className = `fixed top-5 right-5 px-4 py-3 rounded shadow-lg text-white text-sm z-50
-                ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 3000);
+            toast.className = 'toast toast--show ' + (type === 'success' ? 'toast--success' : 'toast--error');
+            setTimeout(() => {
+                toast.classList.remove('toast--show');
+            }, 3000);
         }
 
         // Handle AJAX status update from dropdown without page reload

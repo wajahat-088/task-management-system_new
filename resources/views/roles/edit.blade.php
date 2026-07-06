@@ -1,32 +1,45 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Edit Permissions — {{ ucfirst($role->name) }}
+        <h2 class="header-title">
+            Edit Permissions
+            <span class="role-badge" style="margin-left: 8px; vertical-align: middle;">
+                {{ $role->name }}
+            </span>
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white rounded-lg shadow p-6">
+    <div class="form-page">
+        <div class="form-container" style="max-width: 800px;">
+            <div class="form-card">
+
                 <form method="POST" action="{{ route('roles.update', $role) }}">
                     @csrf
                     @method('PUT')
 
-                    <div class="grid grid-cols-2 gap-3">
-                        @foreach($allPermissions as $permission)
-                            <label class="flex items-center gap-2">
-                                <input type="checkbox" name="permissions[]" value="{{ $permission->name }}"
-                                    @checked($role->permissions->contains('name', $permission->name))>
-                                <span class="text-sm">{{ $permission->name }}</span>
-                            </label>
-                        @endforeach
+                    <div class="form-group form-group--last">
+                        <label class="form-label">Assign Permissions</label>
+
+                        <div class="permissions-grid">
+                            @foreach($allPermissions as $permission)
+                                <label class="permission-item">
+                                    <input type="checkbox" name="permissions[]" value="{{ $permission->name }}"
+                                        @checked($role->permissions->contains('name', $permission->name))>
+                                    <span>{{ str_replace('-', ' ', $permission->name) }}</span>
+                                </label>
+                            @endforeach
+                        </div>
                     </div>
 
-                    <button type="submit"
-                            class="mt-6 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-                        Save Permissions
-                    </button>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn--primary">
+                            Save Permissions
+                        </button>
+                        <a href="{{ route('roles.index') }}" class="btn btn--secondary">
+                            Cancel
+                        </a>
+                    </div>
                 </form>
+
             </div>
         </div>
     </div>

@@ -1,12 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">All Tasks</h2>
+        <div class="header-row">
+            <h2 class="header-title">All Tasks</h2>
 
-            {{-- Sirf woh user dekhe jiske paas create-task permission ho --}}
+            {{-- only show to users with create-task permission --}}
             @can('create-task')
-                <a href="{{ route('tasks.create') }}"
-                   class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                <a href="{{ route('tasks.create') }}" class="btn btn--primary">
                     + Add Task
                 </a>
             @endcan
@@ -14,56 +13,52 @@
 
         {{-- only show to users with view-activity-logs permission --}}
         @can('view-activity-logs')
-            <div class="flex justify-end mt-3">
-                <a href="{{ route('activity-logs.index') }}"
-                   class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+            <div class="header-actions-row">
+                <a href="{{ route('activity-logs.index') }}" class="btn btn--primary">
                     View Activity Logs
                 </a>
             </div>
         @endcan
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="page-content">
+        <div class="page-container">
 
             {{-- Search & Filters --}}
-            <div class="bg-white rounded-lg shadow p-4 mb-6">
-                <form method="GET" action="{{ route('tasks.index') }}"
-                      class="flex flex-wrap gap-3">
+            <div class="filter-card">
+                <form method="GET" action="{{ route('tasks.index') }}" class="filter-form">
 
                     <input type="text" name="search" placeholder="Search by title..."
                            value="{{ request('search') }}"
-                           class="border rounded px-3 py-2 flex-1 min-w-[200px]">
+                           class="form-input form-input--grow">
 
-                    <select name="status" class="border rounded px-8 py-2">
+                    <select name="status" class="form-select">
                         <option value="">All Status</option>
                         <option value="pending"     {{ request('status') == 'pending'     ? 'selected' : '' }}>Pending</option>
                         <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
                         <option value="completed"   {{ request('status') == 'completed'   ? 'selected' : '' }}>Completed</option>
                     </select>
 
-                    <select name="priority" class="border rounded px-8 py-2">
+                    <select name="priority" class="form-select">
                         <option value="">All Priority</option>
                         <option value="low"    {{ request('priority') == 'low'    ? 'selected' : '' }}>Low</option>
                         <option value="medium" {{ request('priority') == 'medium' ? 'selected' : '' }}>Medium</option>
                         <option value="high"   {{ request('priority') == 'high'   ? 'selected' : '' }}>High</option>
                     </select>
 
-                    <button type="submit"
-                            class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                    <button type="submit" class="btn btn--primary">
                         Filter
                     </button>
-                    <a href="{{ route('tasks.index') }}"
-                       class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">
+                    <a href="{{ route('tasks.index') }}" class="btn btn--secondary">
                         Reset
                     </a>
                 </form>
             </div>
 
             {{-- Tasks Table --}}
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+            <div class="table-card">
+                <table class="data-table">
+                    <thead>
                         <tr>
                             @php
                                 $columns = [
@@ -75,52 +70,56 @@
                             @endphp
 
                             @foreach($columns as $column => $label)
-                                <th class="px-6 py-3 text-left">
+                                <th>
                                     <a href="{{ route('tasks.index', array_merge(request()->query(), [
                                             'sort'      => $column,
                                             'direction' => ($sortColumn === $column && $sortDirection === 'asc') ? 'desc' : 'asc',
                                         ])) }}"
-                                       class="flex items-center gap-1 hover:text-gray-900">
+                                       class="sort-link">
                                         {{ $label }}
                                         @if($sortColumn === $column)
                                             @if($sortDirection === 'asc')
-                                                <span>↑</span>
+                                                <span>&uarr;</span>
                                             @else
-                                                <span>↓</span>
+                                                <span>&darr;</span>
                                             @endif
                                         @endif
                                     </a>
                                 </th>
                             @endforeach
 
-                            <th class="px-6 py-3 text-left">Created By</th>
-                            <th class="px-6 py-3 text-left">Actions</th>
+                            <th>Created By</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody>
                         @forelse($tasks as $task)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 font-medium">{{ $task->title }}</td>
+                        <tr>
+                            <td>{{ $task->title }}</td>
 
                             {{-- Priority Badge --}}
-                            <td class="px-6 py-4">
+                            <td>
                                 @if($task->priority == 'high')
-                                    <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">High</span>
+                                    <span class="badge badge--danger">High</span>
                                 @elseif($task->priority == 'medium')
-                                    <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs">Medium</span>
+                                    <span class="badge badge--warning">Medium</span>
                                 @else
-                                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Low</span>
+                                    <span class="badge badge--success">Low</span>
                                 @endif
                             </td>
 
                             {{-- Status — if have edit permission then show dropdown for ajax request. --}}
-                            <td class="px-6 py-4">
+                            <td>
                                 @can('edit-task')
+                                    @php
+                                        $statusModifier = match($task->status) {
+                                            'completed'   => 'status-select--completed',
+                                            'in_progress' => 'status-select--progress',
+                                            default       => 'status-select--pending',
+                                        };
+                                    @endphp
                                     <select
-                                        class="status-select text-xs border rounded px-6 py-1 cursor-pointer
-                                            @if($task->status == 'completed') bg-green-100 text-green-700
-                                            @elseif($task->status == 'in_progress') bg-blue-100 text-blue-700
-                                            @else bg-yellow-100 text-yellow-700 @endif"
+                                        class="status-select {{ $statusModifier }}"
                                         data-task-id="{{ $task->id }}"
                                         data-url="{{ route('tasks.updateStatus', $task) }}">
                                         <option value="pending"     {{ $task->status == 'pending'     ? 'selected' : '' }}>Pending</option>
@@ -129,26 +128,26 @@
                                     </select>
                                 @else
                                     {{-- User role — sirf status text dikhe, dropdown nahi --}}
-                                    <span class="text-xs px-2 py-1 rounded
-                                        @if($task->status == 'completed') bg-green-100 text-green-700
-                                        @elseif($task->status == 'in_progress') bg-blue-100 text-blue-700
-                                        @else bg-yellow-100 text-yellow-700 @endif">
-                                        {{ ucfirst(str_replace('_', ' ', $task->status)) }}
-                                    </span>
+                                    @if($task->status == 'completed')
+                                        <span class="badge badge--success">{{ ucfirst(str_replace('_', ' ', $task->status)) }}</span>
+                                    @elseif($task->status == 'in_progress')
+                                        <span class="badge badge--info">{{ ucfirst(str_replace('_', ' ', $task->status)) }}</span>
+                                    @else
+                                        <span class="badge badge--warning">{{ ucfirst(str_replace('_', ' ', $task->status)) }}</span>
+                                    @endif
                                 @endcan
                             </td>
 
-                            <td class="px-6 py-4">{{ $task->due_date }}</td>
-                            <td class="px-6 py-4">{{ $task->creator->name }}</td>
+                            <td>{{ $task->due_date }}</td>
+                            <td>{{ $task->creator->name }}</td>
 
                             {{-- Actions --}}
-                            <td class="px-6 py-4">
-                                <div class="flex gap-2">
+                            <td>
+                                <div class="row-actions">
 
                                     {{-- if have edit permission --}}
                                     @can('edit-task')
-                                        <a href="{{ route('tasks.edit', $task) }}"
-                                           class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600">
+                                        <a href="{{ route('tasks.edit', $task) }}" class="btn-sm btn-sm--edit">
                                             Edit
                                         </a>
                                     @endcan
@@ -160,8 +159,7 @@
                                               onsubmit="return confirm('Delete this task?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
-                                                    class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600">
+                                            <button type="submit" class="btn-sm btn-sm--delete">
                                                 Delete
                                             </button>
                                         </form>
@@ -170,7 +168,7 @@
                                     {{-- if no permission found show --}}
                                     @cannot('edit-task')
                                         @cannot('delete-task')
-                                            <span class="text-gray-400 text-xs">—</span>
+                                            <span class="no-action">&mdash;</span>
                                         @endcannot
                                     @endcannot
 
@@ -179,7 +177,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-gray-400">
+                            <td colspan="6" class="empty-row">
                                 No tasks found.
                             </td>
                         </tr>
@@ -188,7 +186,7 @@
                 </table>
 
                 @if($tasks->hasPages())
-                <div class="px-6 py-4 border-t">
+                <div class="table-footer">
                     {{ $tasks->links() }}
                 </div>
                 @endif
@@ -198,9 +196,7 @@
     </div>
 
     {{-- Toast --}}
-    <div id="toast"
-         class="fixed top-5 right-5 hidden px-4 py-3 rounded shadow-lg text-white text-sm z-50">
-    </div>
+    <div id="toast" class="toast"></div>
 
     <script>
         @if(session('success'))
@@ -212,10 +208,10 @@
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
-            toast.className = `fixed top-5 right-5 px-4 py-3 rounded shadow-lg text-white text-sm z-50
-                ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 3000);
+            toast.className = 'toast toast--show ' + (type === 'success' ? 'toast--success' : 'toast--error');
+            setTimeout(() => {
+                toast.classList.remove('toast--show');
+            }, 3000);
         }
 
         document.querySelectorAll('.status-select').forEach(select => {

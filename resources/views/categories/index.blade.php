@@ -1,47 +1,45 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Categories</h2>
+        <div class="header-row">
+            <h2 class="header-title">Categories</h2>
 
             {{-- Only visible to users with create-category permission --}}
             @can('create-category')
-                <a href="{{ route('categories.create') }}"
-                   class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                <a href="{{ route('categories.create') }}" class="btn btn--primary">
                     + Add Category
                 </a>
             @endcan
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+    <div class="page-content">
+        <div class="page-container page-container--narrow">
 
             {{-- Categories Table --}}
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+            <div class="table-card">
+                <table class="data-table">
+                    <thead>
                         <tr>
-                            <th class="px-6 py-3 text-left">Name</th>
-                            <th class="px-6 py-3 text-left">Products Count</th>
-                            <th class="px-6 py-3 text-left">Actions</th>
+                            <th>Name</th>
+                            <th>Products Count</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody>
                         @forelse($categories as $category)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 font-medium">{{ $category->name }}</td>
+                        <tr>
+                            <td>{{ $category->name }}</td>
 
                             {{-- Number of products linked to this category --}}
-                            <td class="px-6 py-4">{{ $category->products_count }}</td>
+                            <td>{{ $category->products_count }}</td>
 
                             {{-- Action buttons — shown based on user permissions --}}
-                            <td class="px-6 py-4">
-                                <div class="flex gap-2">
+                            <td>
+                                <div class="row-actions">
 
                                     {{-- Edit button: visible to users with edit-category permission --}}
                                     @can('edit-category')
-                                        <a href="{{ route('categories.edit', $category) }}"
-                                           class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600">
+                                        <a href="{{ route('categories.edit', $category) }}" class="btn-sm btn-sm--edit">
                                             Edit
                                         </a>
                                     @endcan
@@ -53,8 +51,7 @@
                                               onsubmit="return confirm('Delete this category?')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
-                                                    class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600">
+                                            <button type="submit" class="btn-sm btn-sm--delete">
                                                 Delete
                                             </button>
                                         </form>
@@ -63,7 +60,7 @@
                                     {{-- Show dash if user has neither edit nor delete permission --}}
                                     @cannot('edit-category')
                                         @cannot('delete-category')
-                                            <span class="text-gray-400 text-xs">—</span>
+                                            <span class="no-action">&mdash;</span>
                                         @endcannot
                                     @endcannot
 
@@ -72,7 +69,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="3" class="px-6 py-8 text-center text-gray-400">
+                            <td colspan="3" class="empty-row">
                                 No categories found.
                             </td>
                         </tr>
@@ -82,7 +79,7 @@
 
                 {{-- Pagination links --}}
                 @if($categories->hasPages())
-                <div class="px-6 py-4 border-t">
+                <div class="table-footer">
                     {{ $categories->links() }}
                 </div>
                 @endif

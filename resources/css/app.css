@@ -1,3 +1,794 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.action-tile { transition: transform 0.15s ease, border-color 0.15s ease; }
+        .action-tile:hover { transform: translateY(-2px); }
+        .action-tile:focus-visible, .stat-card:focus-visible {
+            outline: 2px solid #3651E3;
+            outline-offset: 2px;
+        }
+
+         .dash-scope { font-family: 'Inter', sans-serif; }
+        .dash-scope .font-display { font-family: 'Sora', sans-serif; }
+        .dash-scope .stat-number { font-family: 'Sora', sans-serif; font-variant-numeric: tabular-nums; }
+    /* ==========================================================================
+   Auth forms (Login / Register)
+   ========================================================================== */
+.auth-link {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    text-decoration: underline;
+}
+
+.auth-link:hover {
+    color: var(--color-text-dark);
+}
+
+.auth-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.auth-checkbox-row input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+}
+
+.auth-checkbox-row label {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+}
+
+
+        /* ==========================================================================
+   Base / Reset
+   ========================================================================== */
+:root {
+    --font-display: 'Sora', -apple-system, sans-serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+
+    --color-bg-page: #F3F4F6;
+    --color-bg-section: #F4F5F7;
+    --color-border: #E4E7EC;
+    --color-text-dark: #12142B;
+    --color-text-muted: #667085;
+    --color-white: #ffffff;
+
+    --color-primary: #29c333;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--color-text-dark);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+button {
+    font-family: inherit;
+}
+
+/* ==========================================================================
+   App shell / layout
+   ========================================================================== */
+.app-shell {
+    min-height: 100vh;
+    background: var(--color-bg-page);
+}
+
+.page-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+@media (min-width: 640px) {
+    .page-container { padding: 0 24px; }
+}
+
+@media (min-width: 1024px) {
+    .page-container { padding: 0 32px; }
+}
+
+.site-header {
+    background: var(--color-white);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+}
+
+.site-header__inner {
+    padding: 24px 16px;
+}
+
+@media (min-width: 640px) {
+    .site-header__inner { padding: 24px; }
+}
+
+@media (min-width: 1024px) {
+    .site-header__inner { padding: 24px 32px; }
+}
+
+/* ==========================================================================
+   Dashboard section wrapper
+   ========================================================================== */
+.dash-scope {
+    background: var(--color-bg-section);
+    padding: 40px 0;
+}
+
+/* ==========================================================================
+   Overview header + live badge
+   ========================================================================== */
+.overview-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin: 0;
+}
+
+.page-subtitle {
+    font-size: 14px;
+    margin: 4px 0 0;
+    color: var(--color-text-muted);
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    padding: 6px 12px;
+}
+
+.status-badge__label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+}
+
+.pulse-dot {
+    position: relative;
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #12B76A;
+}
+
+.pulse-dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: #12B76A;
+    animation: pulse-ring 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 0.6; }
+    75%, 100% { transform: scale(2.4); opacity: 0; }
+}
+
+/* ==========================================================================
+   Section labels
+   ========================================================================== */
+.section-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+    margin: 0 0 12px;
+}
+
+/* ==========================================================================
+   Stat cards (Tasks / Products)
+   ========================================================================== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 40px;
+}
+
+@media (min-width: 640px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1024px) {
+    .stats-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.stat-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    border-left-width: 3px;
+    border-left-style: solid;
+    padding: 16px 20px 16px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.stat-card:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.stat-number {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-text-dark);
+    margin: 0;
+}
+
+.stat-label {
+    font-size: 12px;
+    font-weight: 500;
+    margin: 4px 0 0;
+    color: var(--color-text-muted);
+}
+
+/* status variants */
+.stat-card--neutral   { border-left-color: #475467; }
+.stat-card--neutral .stat-icon   { background: #F2F4F7; color: #475467; }
+
+.stat-card--pending   { border-left-color: #B45309; }
+.stat-card--pending .stat-icon   { background: #FFFAEB; color: #B45309; }
+.stat-card--pending .stat-number { color: #B45309; }
+
+.stat-card--progress  { border-left-color: #026AA2; }
+.stat-card--progress .stat-icon  { background: #F0F9FF; color: #026AA2; }
+.stat-card--progress .stat-number{ color: #026AA2; }
+
+.stat-card--completed { border-left-color: #067647; }
+.stat-card--completed .stat-icon { background: #ECFDF3; color: #067647; }
+.stat-card--completed .stat-number{ color: #067647; }
+
+/* ==========================================================================
+   Quick actions
+   ========================================================================== */
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+@media (min-width: 640px) {
+    .actions-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 1024px) {
+    .actions-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.action-tile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 16px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.action-tile:hover {
+    border-color: #D0D5DD;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.08);
+}
+
+.action-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #F2F4F7;
+    color: #475467;
+}
+
+.action-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.action-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-dark);
+}
+
+/* primary (filled) tile e.g. "New task" / "New product" */
+.action-tile--primary {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.action-tile--primary .action-icon {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+}
+
+.action-tile--primary .action-label {
+    color: #ffffff;
+}
+
+/* admin tiles */
+.action-tile--admin {
+    border-left: 3px solid #7C3AED;
+}
+
+.action-tile--admin .action-icon {
+    background: #F5F3FF;
+    color: #7C3AED;
+}
+
+/* ==========================================================================
+   Administration grid
+   ========================================================================== */
+.admin-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+@media (min-width: 640px) {
+    .admin-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ==========================================================================
+   Toast notification
+   ========================================================================== */
+.toast {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: #ffffff;
+    font-size: 14px;
+    z-index: 50;
+}
+
+.toast--show {
+    display: block;
+}
+
+.toast--success { background: #16A34A; }
+.toast--error   { background: #DC2626; }
+
+/* ==========================================================================
+   Page content wrapper (used on inner pages like Tasks index)
+   ========================================================================== */
+.page-content {
+    padding: 48px 0;
+}
+
+/* ==========================================================================
+   Header slot helpers (used inside x-slot name="header")
+   ========================================================================== */
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.header-title {
+    font-weight: 600;
+    font-size: 20px;
+    color: #1F2937;
+    line-height: 1.3;
+    margin: 0;
+}
+
+.header-actions-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.15s ease;
+    line-height: 1.4;
+}
+
+.btn--primary {
+    background: #29c333;
+    color: #ffffff;
+}
+
+.btn--primary:hover {
+    background: #25a82b;
+}
+
+.btn--secondary {
+    background: #ffffff;
+    color: #374151;
+    border: 1px solid #D1D5DB;
+}
+
+.btn--secondary:hover {
+    background: #F9FAFB;
+    border-color: #29c333;
+}
+
+.btn-sm {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    line-height: 1.6;
+}
+
+.btn-sm--edit {
+    background: #3B82F6;
+}
+
+.btn-sm--edit:hover {
+    background: #2563EB;
+}
+
+.btn-sm--delete {
+    background: #EF4444;
+}
+
+.btn-sm--delete:hover {
+    background: #DC2626;
+}
+
+/* ==========================================================================
+   Filter / search card
+   ========================================================================== */
+.filter-card {
+    background: var(--color-white);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.form-input,
+.form-select {
+    border: 1px solid #D1D5DB;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #1F2937;
+    background: #ffffff;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: 2px solid #29c333!important;
+    outline-offset: 0px!important;
+    border-color: #29c333 !important;
+}
+
+.form-input--grow {
+    flex: 1 1 auto;
+    min-width: 200px;
+}
+
+/* ==========================================================================
+   Table card
+   ========================================================================== */
+.table-card {
+    background: var(--color-white);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
+    overflow: hidden;
+}
+
+.data-table {
+    width: 100%;
+    font-size: 14px;
+    border-collapse: collapse;
+}
+
+.data-table thead {
+    background: #F9FAFB;
+    color: #6B7280;
+}
+
+.data-table th {
+    text-align: left;
+    padding: 12px 24px;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.data-table td {
+    padding: 16px 24px;
+    border-top: 1px solid #F3F4F6;
+}
+
+.data-table tbody tr:hover {
+    background: #F9FAFB;
+}
+
+.sort-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.sort-link:hover {
+    color: #111827;
+}
+
+.row-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.empty-row {
+    padding: 32px 24px;
+    text-align: center;
+    color: #9CA3AF;
+}
+
+.table-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #E5E7EB;
+}
+
+.no-action {
+    font-size: 12px;
+    color: #9CA3AF;
+}
+
+/* ==========================================================================
+   Badges (priority + status)
+   ========================================================================== */
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.badge--danger  { background: #FEE2E2; color: #B91C1C; }
+.badge--warning { background: #FEF9C3; color: #A16207; }
+.badge--success { background: #DCFCE7; color: #15803D; }
+.badge--info    { background: #DBEAFE; color: #1D4ED8; }
+
+/* status <select> colored like a badge */
+.status-select {
+    font-size: 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 4px;
+    padding: 4px 24px 4px 8px;
+    cursor: pointer;
+}
+
+.status-select--pending  { background: #FEF9C3; color: #A16207; }
+.status-select--progress { background: #DBEAFE; color: #1D4ED8; }
+.status-select--completed{ background: #DCFCE7; color: #15803D; }
+
+/* ==========================================================================
+   Form pages (Create / Edit Task)
+   ========================================================================== */
+.form-page {
+    padding: 48px 0;
+}
+
+.form-container {
+    max-width: 672px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+@media (min-width: 640px) {
+    .form-container { padding: 0 24px; }
+}
+
+@media (min-width: 1024px) {
+    .form-container { padding: 0 32px; }
+}
+
+.form-card {
+    background: var(--color-white);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
+    padding: 24px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group--last {
+    margin-bottom: 24px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+.form-control {
+    width: 100%;
+    border: 1px solid #D1D5DB;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #1F2937;
+    background: #ffffff;
+    font-family: inherit;
+}
+
+.form-control:focus {
+    outline: 2px solid var(--color-primary)!important;
+    outline-offset: 0px!important;
+    border-color: var(--color-primary);
+}
+
+.form-control--error {
+    border-color: #EF4444;
+}
+
+.form-error {
+    font-size: 12px;
+    color: #EF4444;
+    margin: 4px 0 0;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* ==========================================================================
+   Permission checkboxes (Roles - Edit Permissions)
+   ========================================================================== */
+.permissions-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+@media (min-width: 640px) {
+    .permissions-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1024px) {
+    .permissions-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.permission-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--color-bg-section);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.permission-item:hover {
+    border-color: var(--color-primary);
+    background: #ffffff;
+}
+
+.permission-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.permission-item span {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-dark);
+    text-transform: capitalize;
+}
+
+.role-badge {
+    display: inline-block;
+    background: #F5F3FF;
+    color: #7C3AED;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
